@@ -1,0 +1,256 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap');
+
+:root{
+    --cor-primaria: #0F766E;
+    --cor-secundaria: #F97066;
+    --cor-texto: #334155;
+    --cor-fundo: #FAF7F2;
+    --cor-destaque: #D4A017;
+    --cor-fundo-input: #dfdbd9;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: "Source Sans 3", "Nunito", sans-serif;
+    font-size: 12pt;
+    color: var(--cor-texto);
+    background-color: var(--cor-primaria);
+    text-align: center;
+    overflow: hidden;
+    margin: 0;
+}
+
+.body-crud {
+    flex-direction: row;
+}
+
+.login-container {
+    box-sizing: border-box;
+    background-color: var(--cor-fundo);
+    width: max(40%, 400px);
+    padding: 70px;
+    border-radius: 20px;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
+}
+
+h1, h2 {
+    font-family: "Nunito Bold", sans-serif;
+}
+
+form {
+    width: 100%;
+    margin-top: 20px;
+    margin-bottom: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+form > div {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+form label {
+    flex-shrink: 0;
+    height: 50px;
+    width: 50px;
+    background-color: var(--cor-primaria);
+    fill: var(--cor-secundaria);
+    color: var(--cor-secundaria);
+    border-radius: 10px 0 0 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+form input {
+    box-sizing: border-box;
+    flex-grow: 1;
+    min-width: 0;
+    height: 50px;
+    padding: 1em;
+    font: inherit;
+    border-radius: 0 10px 10px 0;
+    border: none;
+    background-color: var(--cor-fundo-input);
+    border-top: 2px solid var(--cor-fundo-input);
+    border-right: 2px solid var(--cor-fundo-input);
+    border-bottom: 2px solid var(--cor-fundo-input);
+    transition: 100ms ease;
+}
+
+form input:hover {
+    border-top-color: var(--cor-primaria);
+    border-right-color: var(--cor-primaria);
+    border-bottom-color: var(--cor-primaria);
+}
+
+form input:focus {
+    outline: none;
+    border-top-color: var(--cor-secundaria);
+    border-right-color: var(--cor-secundaria);
+    border-bottom-color: var(--cor-secundaria);
+}
+
+div:has(input:focus) > label {
+    background-color: var(--cor-secundaria);
+    color: var(--cor-primaria);
+    svg path {
+        fill: var(--cor-primaria);
+    }
+}
+
+form button {
+    margin-top: 10px;
+    border: none;
+    border-radius: 10px;
+    padding: 0.6em 2.4em;
+    background-color: var(--cor-primaria);
+    color: var(--cor-fundo);
+    border: 2px solid var(--cor-primaria);
+    font: inherit;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 100ms ease;
+}
+
+form button:hover {
+    color: var(--cor-secundaria);
+    border-color: var(--cor-secundaria);
+}
+
+form button:focus {
+    outline: none;
+    color: var(--cor-secundaria);
+    border-color: var(--cor-secundaria);
+}
+
+form button:active {
+    background-color: var(--cor-secundaria);
+    color: var(--cor-primaria);
+}
+
+a {
+    color: var(--cor-secundaria);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+#logo-login {
+    width: 474px;
+    height: auto;
+    margin-bottom: 40px;
+}
+
+@media(max-width: 1400px) {
+    .login-container {
+        width: min(660px, 100%);
+        padding: 40px;
+    }
+}
+
+.sidebar {
+    box-sizing: border-box;
+    background-color: var(--cor-fundo);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: min(500px, 70%);
+    height: 100vh;
+    padding: 20px;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
+    border-radius: 0 10px 10px 0;
+    position: relative;
+}
+
+#logo-sidebar {
+    width: 100%;
+    height: auto;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--cor-primaria);
+}
+
+#logout-button {
+    margin-top: 10px;
+    border: none;
+    border-radius: 10px;
+    padding: 0.3em 4em;
+    background-color: var(--cor-primaria);
+    color: var(--cor-fundo);
+    border: 2px solid var(--cor-primaria);
+    font: inherit;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 100ms ease;
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+}
+
+#logout-button:hover {
+    color: var(--cor-secundaria);
+    border-color: var(--cor-secundaria);
+}
+
+#logout-button:focus {
+    outline: none;
+    color: var(--cor-secundaria);
+    border-color: var(--cor-secundaria);
+}
+
+#logout-button:active {
+    background-color: var(--cor-secundaria);
+    color: var(--cor-primaria);
+}
+
+.main {
+    width: 70%;
+    align-items: center;
+    color: var(--cor-fundo);
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    background-color: var(--cor-fundo);
+    color: var(--cor-texto);
+}
+
+th {
+    padding: 5px;
+}
+
+td {
+    border-bottom: 1px solid var(--cor-texto);
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.crud-button {
+    cursor: pointer;
+}
+
+.checkbox > span {
+    align-items: center;
+    font-family: inherit;;
+}
