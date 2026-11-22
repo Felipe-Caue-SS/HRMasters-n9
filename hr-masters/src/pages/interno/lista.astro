@@ -1,0 +1,44 @@
+---
+import InternoLayout from "@layouts/InternoLayout.astro";
+
+const funcionarios = [{
+    nome: "Cleiton",
+    empresa: "Cleitinho Corp",
+    cargo: "CEO",
+    salario: 69000000,
+    status: "ativo",
+}]
+---
+
+<InternoLayout titulo="Lista de Funcionários" descricao="Lista de funcionarios no sistema hr masters">
+    <h1>Lista</h1>
+
+    <table>
+        <tr>
+            <th>Nome</th>
+            <th>Empresa</th>
+            <th>Cargo</th>
+            <th>Salário</th>
+            <th>Status</th>
+        </tr>
+
+        {funcionarios.map((funcionario) => {
+            return (
+                <tr class={funcionario.status}>
+                    <td>{funcionario.nome}</td>
+                    <td>{funcionario.empresa}</td>
+                    <td>{funcionario.cargo}</td>
+                    <td>{funcionario.salario}</td>
+                    <td>{funcionario.status}</td>
+                </tr>
+            )
+        })}
+
+    </table>
+</InternoLayout>
+
+<style>
+    table {
+        width: 100%;
+    }
+</style>

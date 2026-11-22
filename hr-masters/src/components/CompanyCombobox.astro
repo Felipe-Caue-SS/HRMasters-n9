@@ -1,0 +1,84 @@
+---
+interface Props {
+  id?: string;
+  name?: string;
+  label?: string;
+  placeholder?: string;
+  required?: boolean;
+  initialCompanyId?: string;
+  initialCompanyName?: string;
+}
+
+const {
+  id = 'empresa',
+  name = 'empresa',
+  label = 'Empresa',
+  placeholder = 'Selecione ou digite uma empresa',
+  required = false,
+  initialCompanyId = '',
+  initialCompanyName = '',
+} = Astro.props;
+---
+
+<div data-company-combobox class="combobox-container">
+  <input
+    id={id}
+    name={name}
+    type="text"
+    list={`${id}-list`}
+    placeholder={placeholder}
+    value={initialCompanyName}
+    required={required}
+    autocomplete="off"
+    data-company-input
+  />
+  <input
+    type="hidden"
+    name={`${name}Id`}
+    value={initialCompanyId}
+    data-company-id
+  />
+  <datalist id={`${id}-list`} data-company-list></datalist>
+</div>
+
+<script>
+  import { dbSeedReady } from '@lib/seed.ts';
+  import { listCompanies } from '@lib/dbEmpresas.ts';
+
+  function escapeAttr(value: string): string {
+    return value.replaceAll('&', '&amp;').replaceAll('"', '&quot;');
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-company-combobox]').forEach(async (root) => {
+    const input = root.querySelector<HTMLInputElement>('[data-company-input]')!;
+    const hiddenId = root.querySelector<HTMLInputElement>('[data-company-id]')!;
+    const datalist = root.querySelector<HTMLDataListElement>('[data-company-list]')!;
+
+    await dbSeedReady();
+    const companies = await listCompanies();
+
+    datalist.innerHTML = companies
+      .map((c) => `<option value="${escapeAttr(c.nome)}"></option>`)
+      .join('');
+
+    const syncId = () => {
+      const match = companies.find(
+        (c) => c.nome.toLowerCase() === input.value.trim().toLowerCase()
+      );
+      hiddenId.value = match ? match.id : '';
+    };
+
+    input.addEventListener('input', syncId);
+    syncId();
+  });
+</script>
+
+<style>
+  .combobox-container {
+    width: 100%;
+  }
+
+  input {
+    width: 100%;
+  }
+</style>

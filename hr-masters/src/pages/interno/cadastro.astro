@@ -1,0 +1,122 @@
+---
+import InternoLayout from "@layouts/InternoLayout.astro";
+
+import CompanyCombobox from "@components/CompanyCombobox.astro";
+---
+
+<InternoLayout
+  titulo="Cadastro"
+  descricao="Cadastro de funcionarios no sistema hr masters"
+>
+  <div class="form-wrapper">
+    <form>
+      <fieldset>
+        <label for="nome">Nome Completo</label>
+        <input id="nome" type="text" placeholder="Nome Completo" />
+      </fieldset>
+
+      <fieldset>
+        <label for="nascimento">Data de Nascimento</label>
+        <input id="nascimento" type="date" />
+      </fieldset>
+
+      <fieldset>
+        <label for="cpf">cpf</label>
+        <input id="cpf" type="text" placeholder="xxx.xxx.xxx-xx" />
+      </fieldset>
+
+      <fieldset>
+        <label for="pis">PIS / PASEP</label>
+        <input id="pis" type="number" placeholder="PIS / PASEP" />
+      </fieldset>
+
+      <fieldset>
+        <label for="telefone">Telefone</label>
+        <input id="telefone" type="tel" placeholder="+55 (xx) xxxxx - xxxx" />
+      </fieldset>
+
+      <fieldset>
+        <label for="email">email</label>
+        <input id="email" type="email" placeholder="xxxx@xxx.com" />
+      </fieldset>
+
+      <fieldset>
+        <label for="empresa">Empresa</label>
+        <CompanyCombobox id="empresa" required={true} />
+      </fieldset>
+
+      <fieldset>
+        <label for="adimissao">Data Admissão</label>
+        <input id="adimissao" type="date" />
+      </fieldset>
+
+      <fieldset>
+        <label for="cargo">Cargo</label>
+        <input id="cargo" type="text" placeholder="Nome Cargo" />
+      </fieldset>
+
+      <fieldset>
+        <label for="salario">Salário</label>
+        <input id="salario" type="number" placeholder="R$" />
+      </fieldset>
+
+      <button id="enviar" type="submit">Registrar Cadastro</button>
+    </form>
+  </div>
+</InternoLayout>
+
+<style>
+  .form-wrapper {
+    padding: 8px;
+
+    border: 2px solid var(--cor-texto);
+    border-radius: 16px;
+  }
+
+  form {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+
+    container-name: form;
+
+    fieldset {
+      min-width: 148px;
+      width: 40cqw;
+
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+      gap: 4px;
+
+      border: none;
+
+      input {
+        width: 100%;
+      }
+
+      #enviar {
+        width: 100cqw;
+      }
+    }
+  }
+  @media only screen and (max-width: 360px) {
+    form {
+      flex-direction: column;
+      align-items: center;
+
+      fieldset {
+        width: 100%;
+      }
+    }
+  }
+</style>
+
+<script>
+    function onComplete () {
+
+    }
+</script>

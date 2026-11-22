@@ -1,0 +1,32 @@
+---
+import InternoLayout from "@layouts/InternoLayout.astro";
+---
+
+<InternoLayout
+  titulo="Busca"
+  descricao="Busca por funcionarios no sistema hr masters"
+>
+  <h1>Busca</h1>
+  <fieldset>
+    <input id="query" type="search" />
+    <button id="buscar" type="submit">Buscar</button>
+  </fieldset>
+</InternoLayout>
+
+<style>
+    fieldset {
+        display: flex;
+        justify-content: center;
+        border: none;
+
+        #query {
+            width: 60vw;
+
+            border-radius: 8px 0 0 8px;
+        }
+
+        #buscar {
+            border-radius: 0 8px 8px 0;
+        }
+    }
+</style>
