@@ -1,7 +1,11 @@
 ---
 import InternoLayout from "@layouts/InternoLayout.astro";
 
+import InputCPF from "@components/InputCPF.astro";
+import InputPisPasep from "@components/InputPisPasep.astro";
+import InputTelefone from "@components/InputTelefone.astro";
 import CompanyCombobox from "@components/CompanyCombobox.astro";
+import InputSalario from "@components/InputSalario.astro";
 ---
 
 <InternoLayout
@@ -9,35 +13,45 @@ import CompanyCombobox from "@components/CompanyCombobox.astro";
   descricao="Cadastro de funcionarios no sistema hr masters"
 >
   <div class="form-wrapper">
-    <form>
+    <form id="form-funcionario">
       <fieldset>
         <label for="nome">Nome Completo</label>
-        <input id="nome" type="text" placeholder="Nome Completo" />
+        <input
+          id="nome"
+          type="text"
+          placeholder="Nome Completo"
+          required="true"
+        />
       </fieldset>
 
       <fieldset>
         <label for="nascimento">Data de Nascimento</label>
-        <input id="nascimento" type="date" />
+        <input id="nascimento" type="date" required="true" />
       </fieldset>
 
       <fieldset>
         <label for="cpf">cpf</label>
-        <input id="cpf" type="text" placeholder="xxx.xxx.xxx-xx" />
+        <InputCPF id="cpf" required={true} />
       </fieldset>
 
       <fieldset>
-        <label for="pis">PIS / PASEP</label>
-        <input id="pis" type="number" placeholder="PIS / PASEP" />
+        <label for="pispasep">PIS / PASEP</label>
+        <InputPisPasep id="pispasep" required={true} />
       </fieldset>
 
       <fieldset>
         <label for="telefone">Telefone</label>
-        <input id="telefone" type="tel" placeholder="+55 (xx) xxxxx - xxxx" />
+        <InputTelefone id="telefone" required={true} />
       </fieldset>
 
       <fieldset>
         <label for="email">email</label>
-        <input id="email" type="email" placeholder="xxxx@xxx.com" />
+        <input
+          id="email"
+          type="email"
+          placeholder="xxxx@xxx.com"
+          required="true"
+        />
       </fieldset>
 
       <fieldset>
@@ -46,21 +60,28 @@ import CompanyCombobox from "@components/CompanyCombobox.astro";
       </fieldset>
 
       <fieldset>
-        <label for="adimissao">Data Admissão</label>
-        <input id="adimissao" type="date" />
+        <label for="admissao">Data Admissão</label>
+        <input id="admissao" type="date" required="true" />
       </fieldset>
 
       <fieldset>
         <label for="cargo">Cargo</label>
-        <input id="cargo" type="text" placeholder="Nome Cargo" />
+        <input
+          id="cargo"
+          type="text"
+          placeholder="Nome Cargo"
+          required="true"
+        />
       </fieldset>
 
       <fieldset>
         <label for="salario">Salário</label>
-        <input id="salario" type="number" placeholder="R$" />
+        <InputSalario id="salario" required={true} />
       </fieldset>
 
-      <button id="enviar" type="submit">Registrar Cadastro</button>
+      <button id="enviar" type="submit">
+        Registrar Cadastro
+      </button>
     </form>
   </div>
 </InternoLayout>
@@ -115,8 +136,69 @@ import CompanyCombobox from "@components/CompanyCombobox.astro";
   }
 </style>
 
-<script>
-    function onComplete () {
+<script type="module">
+  import { dbSeedReady } from "@lib/seed.ts";
+  import debounce from "@utils/debounce";
+  import { resolveCompanySelection } from "@lib/dbEmpresas.ts";
+  import { createEmployee } from "@lib/dbFuncionarios.ts";
 
+  const form = document.querySelector("#form-funcionario");
+  const btnEnviar = document.querySelector("#enviar");
+
+  dbSeedReady().catch((err) => {
+    console.error("Erro ao inicializar base:", err);
+  });
+
+  const handleSubmit = debounce(async () => {
+    btnEnviar.disabled = true;
+
+    const selectedCompanyId = form.querySelector("[data-company-id]").value;
+    const typedCompanyName =
+      form.querySelector("[data-company-input]").value ?? "";
+
+    try {
+      await dbSeedReady();
+
+      const company = await resolveCompanySelection({
+        selectedId: selectedCompanyId,
+        typedName: typedCompanyName,
+      });
+
+      const funcionario = await createEmployee({
+        nome: form.querySelector("#nome").value,
+        dataNascimento: form.querySelector("#nascimento").value,
+        cpf: form.querySelector("#cpf").value,
+        pisPasep: form.querySelector("#pispasep").value,
+        telefone: form.querySelector("#telefone").value,
+        email: form.querySelector("#email").value,
+        empresaId: company.id,
+        empresa: company.nome,
+        dataAdmissao: form.querySelector("#admissao").value,
+        cargo: form.querySelector("#cargo").value,
+        salario: form.querySelector("#salario").value,
+      });
+
+      console.log("Funcionário cadastrado:", funcionario);
+
+      form.reset();
+
+      const hiddenCompanyId = form.querySelector("[data-company-id]");
+      if (hiddenCompanyId) {
+        hiddenCompanyId.value = "";
+      }
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Não foi possível cadastrar o funcionário.";
+      console.error(message);
+    } finally {
+      btnEnviar.disabled = false;
     }
+  });
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    handleSubmit();
+  });
 </script>

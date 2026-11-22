@@ -1,0 +1,50 @@
+---
+interface Props {
+  id?: string;
+  label?: string;
+  placeholder?: string;
+  required?: boolean;
+  value?: string;
+}
+
+const {
+  id = "telefone",
+  label = "Telefone",
+  placeholder = "+55 (00) 00000 - 0000",
+  required = false,
+  value = "",
+} = Astro.props;
+---
+
+  <input
+    id={id}
+    name={id}
+    type="tel"
+    inputmode="tel"
+    maxlength="21"
+    placeholder={placeholder}
+    required={required}
+    value={value}
+    data-input-telefone
+  />
+
+<script>
+  import { formatTelefone } from "@utils/telefoneHandler";
+
+  function setupTelefone() {
+    document
+      .querySelectorAll<HTMLInputElement>("[data-input-telefone]")
+      .forEach((input) => {
+        if (input.dataset.bound) return;
+        input.dataset.bound = "true";
+
+        input.addEventListener("input", (e) => {
+          const el = e.target as HTMLInputElement;
+          el.value = formatTelefone(el.value);
+        });
+      });
+  }
+
+  setupTelefone();
+  document.addEventListener("astro:page-load", setupTelefone);
+</script>

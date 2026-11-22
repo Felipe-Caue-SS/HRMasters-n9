@@ -1,0 +1,48 @@
+---
+interface Props {
+  id?: string;
+  placeholder?: string;
+  required?: boolean;
+  value?: string;
+}
+
+const {
+  id = "cpf",
+  placeholder = "000.000.000-00",
+  required = false,
+  value = "",
+} = Astro.props;
+---
+
+<input
+  id={id}
+  name={id}
+  type="text"
+  inputmode="numeric"
+  maxlength="14"
+  placeholder={placeholder}
+  required={required}
+  value={value}
+  data-input-cpf
+/>
+
+<script>
+  import { formatCPF } from "@utils/cpfHandler";
+
+  function setupCpf() {
+    document
+      .querySelectorAll<HTMLInputElement>("[data-input-cpf]")
+      .forEach((input) => {
+        if (input.dataset.bound) return;
+        input.dataset.bound = "true";
+
+       input.addEventListener("input", (e) => {
+          const el = e.target as HTMLInputElement;
+          el.value = formatCPF(el.value);
+        });
+      });
+  }
+
+  setupCpf();
+  document.addEventListener("astro:page-load", setupCpf);
+</script>

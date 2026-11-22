@@ -1,0 +1,49 @@
+---
+interface Props {
+  id?: string;
+  placeholder?: string;
+  required?: boolean;
+  value?: string;
+}
+
+const {
+  id = "pis",
+  placeholder = "000.00000.00-0",
+  required = false,
+  value = "",
+} = Astro.props;
+---
+
+<input
+  id={id}
+  name={id}
+  type="text"
+  inputmode="numeric"
+  maxlength="14"
+  placeholder={placeholder}
+  required={required}
+  value={value}
+  data-input-pis
+/>
+
+<script>
+  import { formatPisPasep } from "@utils/pispasepHandler";
+
+  function setupPis() {
+    document
+      .querySelectorAll<HTMLInputElement>("[data-input-pis]")
+      .forEach((input) => {
+        if (input.dataset.bound) return;
+        input.dataset.bound = "true";
+
+        input.addEventListener("input", (e) => {
+          const el = e.target as HTMLInputElement;
+          el.value = formatPisPasep(el.value);
+        });
+      });
+  }
+
+  setupPis();
+  document.addEventListener("astro:page-load", setupPis);
+</script>
+

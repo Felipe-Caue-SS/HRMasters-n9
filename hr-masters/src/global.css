@@ -91,6 +91,19 @@ body {
 
 /* Inputs */
 
-input, button {
-  padding: 4px;
+input,
+button {
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 2px solid var(--cor-primaria);
+  outline: transparent;
+  background-color: rgb(from var(--cor-primaria) r g b / 0.1);
+  transition: all 0.3s ease;
+}
+
+input:focus,
+button:focus,
+button:hover {
+  border: 2px solid var(--cor-secundaria);
+  box-shadow: 0 0 8px inset rgb(from var(--cor-secundaria) r g b / 0.5);
 }

@@ -91,11 +91,6 @@ export async function createCompany(nome: string): Promise<Company> {
   }
 }
 
-/**
- * Ideal para o combobox select:
- * - Se o usuário selecionou uma empresa existente, retorna o registro correspondente.
- * - Se o usuário digitou um nome novo, cria na store `empresas` e retorna o novo registro.
- */
 export async function resolveCompanySelection(params: {
   selectedId?: string;
   typedName?: string;
@@ -106,7 +101,6 @@ export async function resolveCompanySelection(params: {
   if (selectedId) {
     const byId = await getCompanyById(selectedId);
     if (byId) {
-      // Se o usuário também editou o texto do combobox para um nome diferente, atualiza/cria
       if (typedName && typedName.toLowerCase() !== byId.nome.toLowerCase()) {
         return createCompany(typedName);
       }
