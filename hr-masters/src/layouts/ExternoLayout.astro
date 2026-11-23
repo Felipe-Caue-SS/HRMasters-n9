@@ -1,0 +1,101 @@
+---
+import BaseHead from "../components/BaseHead.astro";
+
+interface Props {
+  empresa: string;
+  titulo: string;
+  descricao?: string;
+}
+
+const { titulo, descricao, empresa } = Astro.props;
+---
+
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <BaseHead titulo={titulo} descricao={descricao} />
+  </head>
+  <body id="app" data-empresa={empresa}>
+    <header>
+      <ul>
+        <li>
+          <h3>
+            <a href={`/${empresa}/`}>Home</a>
+          </h3>
+          
+        </li>
+        <li>
+          <h3>
+            <a href={`/${empresa}/lista`}>Lista</a>
+          </h3>
+        </li>
+        <li>
+          <h3>
+            <a href={`/${empresa}/busca`}>Busca</a>
+          </h3>
+        </li>
+      </ul>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer>
+      <p>HRMasters © 2026. Todos os direitos reservados</p>
+    </footer>
+  </body>
+</html>
+
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    padding: 16px var(--side-padding);
+
+    background-color: var(--cor-primaria);
+
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
+
+    ul {
+      height: 100%;
+      width: 100%;
+
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+
+      list-style: none;
+    }
+
+    a {
+      text-decoration: none;
+      color: var(--cor-destaque);
+
+      transition: all 0.15  s ease;
+    }
+
+    a:hover,
+    a:focus {
+      color: var(--cor-secundaria);
+      text-decoration: underline 2px solid;
+      text-underline-offset: 4px;
+
+      outline: transparent;
+    }
+  }
+
+  main {
+    padding: 12px var(--side-padding);
+  }
+
+  footer {
+    padding: 16px var(--side-padding);
+    text-align: center;
+    font-size: 0.8rem;
+  }
+</style>

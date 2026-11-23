@@ -1,0 +1,71 @@
+---
+import InternoLayout from "@layouts/InternoLayout.astro";
+---
+
+<InternoLayout
+  titulo="Lista de empresas | HR Masters"
+  descricao="Lista de empresas na plataforma HR Masters"
+>
+  <h1>Empresas Cadastradas</h1>
+  <ul id="lista-empresas">
+    <li>Carregando empresas...</li>
+  </ul>
+</InternoLayout>
+
+<script type="module">
+  import { listCompanies } from "@lib/dbEmpresas";
+
+  const listaEl = document.getElementById("lista-empresas");
+
+  async function carregarEmpresas() {
+    if (!listaEl) return;
+
+    try {
+      const empresas = await listCompanies();
+
+      if (!empresas || empresas.length === 0) {
+        listaEl.innerHTML = "<li>Nenhuma empresa encontrada.</li>";
+        return;
+      } else {
+        listaEl.innerHTML = empresas
+          .map(
+            (empresa) => `
+                <li>
+                  <a href="/clientes/lista?id=${encodeURIComponent(empresa.id)}">
+                    ${empresa.nome}
+                  </a>
+                </li>
+              `,
+          )
+          .join("");
+      }
+    } catch (erro) {
+      listaEl.innerHTML = "<li>Erro ao carregar empresas do IndexedDB.</li>";
+      console.error(erro);
+    }
+  }
+
+  carregarEmpresas();
+</script>
+
+<style>
+  h1 {
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  ul {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: clamp(20px, 10vw, 80px);
+
+    list-style: none;
+  }
+
+  a {
+    text-decoration: none;
+    color: var(--cor-texto);
+  }
+</style>

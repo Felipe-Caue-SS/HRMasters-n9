@@ -1,0 +1,153 @@
+---
+import ExternoLayout from "@layouts/ExternoLayout.astro";
+---
+
+<ExternoLayout
+  titulo="Carregando... | HR Masters"
+  descricao="Acesso a plataforma HR Masters"
+  empresa=""
+>
+  <div id="app" class="container">
+    <h1 id="titulo-empresa">Lista</h1>
+
+    <table id="tabela">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>CPF</th>
+          <th>Empresa</th>
+          <th>Cargo</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="tabela-resultados"></tbody>
+    </table>
+  </div>
+</ExternoLayout>
+
+<script type="module">
+  import { dbSeedReady } from "@lib/seed";
+  import { listEmployees } from "@lib/dbFuncionarios";
+  import { getCompanyById } from "@lib/dbEmpresas";
+
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
+
+  const app = document.querySelector("#app");
+  const tituloEmpresa = document.querySelector("#titulo-empresa");
+  const tbody = document.querySelector("#tabela-resultados");
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#39;");
+  }
+
+  function renderResultados(lista) {
+    if (!tbody) return;
+    tbody.innerHTML = lista
+      .map((resultado) => {
+        const statusTexto = resultado.ativo ? "ativo" : "arquivado";
+        return `
+          <tr class="${statusTexto}">
+            <td>${escapeHtml(resultado.nome)}</td>
+            <td>${escapeHtml(resultado.cpf)}</td>
+            <td>${escapeHtml(resultado.empresa)}</td>
+            <td>${escapeHtml(resultado.cargo)}</td>
+            <td>${escapeHtml(statusTexto)}</td>
+          </tr>
+        `;
+      })
+      .join("");
+  }
+
+  async function init() {
+    if (!app) return;
+
+    if (!id) {
+      app.innerHTML = "<h1>ID da empresa não informado na URL.</h1>";
+      return;
+    }
+
+    try {
+      await dbSeedReady();
+
+      const empresaData = await getCompanyById(id);
+
+      if (!empresaData) {
+        app.innerHTML = "<h1>Empresa não encontrada.</h1>";
+        return;
+      }
+
+      document.title = `${empresaData.nome} | HR Masters`;
+      if (tituloEmpresa) {
+        tituloEmpresa.textContent = `Lista - ${empresaData.nome}`;
+      }
+
+      const filtros = {
+        empresa: empresaData.nome,
+      };
+
+      const funcionarios = await listEmployees(filtros);
+      renderResultados(funcionarios);
+    } catch (err) {
+      console.error("Erro ao carregar dados:", err);
+      app.innerHTML = "<h1>Erro ao carregar os dados da empresa.</h1>";
+    }
+  }
+
+  init();
+</script>
+
+<style>
+  body {
+    background-color: var(--cor-fundo);
+
+    h1 {
+      margin-top: 20px;
+      text-align: center;
+    }
+  }
+
+  table {
+    border-collapse: collapse;
+    box-sizing: border-box;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    width: 100%;
+    background-color: var(--cor-fundo);
+    color: var(--cor-texto);
+  }
+
+  th {
+    padding: 10px;
+    width: 9rem;
+    border-top: 2px solid var(--cor-texto);
+    border-bottom: 2px solid var(--cor-texto);
+    background-color: var(--cor-primaria);
+    color: var(--cor-destaque);
+    font-weight: 800;
+  }
+
+  td {
+    border-bottom: 1px solid var(--cor-texto);
+    padding: 6px;
+  }
+
+  tr {
+    transition: all 0.15s ease;
+  }
+
+  tr:nth-child(even) {
+    background-color: rgb(from var(--cor-secundaria) r g b / 0.1);
+  }
+
+  tr:hover,
+  tr:active {
+    box-shadow: 0 0 6px inset rgb(from var(--cor-destaque) r g b / 0.6);
+    color: var(--cor-destaque);
+  }
+</style>
