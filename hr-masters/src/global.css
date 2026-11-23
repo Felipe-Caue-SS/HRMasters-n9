@@ -120,7 +120,7 @@ table {
 
     th {
         padding: 5px;
-        width: 9rem;
+        width: 20rem;
         border-top: 1px solid var(--cor-texto);
         border-bottom: 2px solid var(--cor-texto);
         background-color: var(--cor-primaria);
@@ -131,7 +131,7 @@ table {
     td {
         border-bottom: 1px solid var(--cor-texto);
         padding: 5px;
-        width: 9rem;
+        width: 20rem;
         font-size: 0.8rem;
     }
 
