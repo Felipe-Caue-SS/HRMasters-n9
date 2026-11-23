@@ -1,5 +1,5 @@
 - [x] Página interno/Cadastro
-- [] Página interno/Busca
+- [x] Página interno/Busca
 - [] Estilizar Página interno/cadastro
 - [] Estilizar Página interno/lista
 - [] Lista dinamica (interno/lista)
