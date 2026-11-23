@@ -1,90 +1,94 @@
 ---
 import InternoLayout from "@layouts/InternoLayout.astro";
 
-const funcionarios = [{
+const funcionarios = [
+  {
     nome: "Cleiton",
     empresa: "Cleitinho Corp",
     cargo: "CEO",
     salario: 69000000,
     status: "ativo",
-}]
+  },
+];
 ---
 
-<InternoLayout titulo="Lista de Funcionários" descricao="Lista de funcionarios no sistema hr masters">
-    <h1>Lista</h1>
+<InternoLayout
+  titulo="Lista de Funcionários"
+  descricao="Lista de funcionarios no sistema hr masters"
+>
+  <h1>Lista</h1>
 
-    <table>
-        <tr>
-            <th>Nome</th>
-            <th>Empresa</th>
-            <th>Cargo</th>
-            <th>Salário</th>
-            <th>Status</th>
-        </tr>
+  <table>
+    <tr>
+      <th>Nome</th>
+      <th>Empresa</th>
+      <th>Cargo</th>
+      <th>Salário</th>
+      <th>Status</th>
+    </tr>
 
-        {funcionarios.map((funcionario) => {
-            return (
-                <tr class={funcionario.status}>
-                    <td>{funcionario.nome}</td>
-                    <td>{funcionario.empresa}</td>
-                    <td>{funcionario.cargo}</td>
-                    <td>{funcionario.salario}</td>
-                    <td>{funcionario.status}</td>
-                </tr>
-            )
-        })}
-
-    </table>
+    <tbody>
+      {funcionarios.map((funcionario) => {
+        return (
+          <tr class={funcionario.status}>
+            <td>{funcionario.nome}</td>
+            <td>{funcionario.empresa}</td>
+            <td>{funcionario.cargo}</td>
+            <td>{funcionario.salario}</td>
+            <td>{funcionario.status}</td>
+          </tr>
+        );
+      })}
+    </tbody>
+  </table>
 </InternoLayout>
 
 <style>
-    body {
-        background-color: var(--cor-fundo);
+  body {
+    background-color: var(--cor-fundo);
 
-        h1 {
-            margin-top: 20px;
-            text-align: center;
-        }
+    h1 {
+      margin-top: 20px;
+      text-align: center;
     }
-    
-    table {
-        border-collapse: collapse;
-        box-sizing: border-box;
-        box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.3);
-        display: flex;
-        flex-direction: row;
-        text-align: center;
-        align-items: center;
-        width: 100%;
-        background-color: var(--cor-fundo);
-        color: var(--cor-texto);
-    }
+  }
 
-    th {
-        padding: 5px;
-        width: 9rem;
-        border-top: 1px solid var(--cor-texto);
-        border-bottom: 2px solid var(--cor-texto);
-        background-color: var(--cor-primaria);
-        color: var(--cor-destaque);
-        font-weight: 800;
-    }
+  table {
+    border-collapse: collapse;
+    box-sizing: border-box;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    width: 100%;
+    background-color: var(--cor-fundo);
+    color: var(--cor-texto);
+  }
 
-    td {
-        border-bottom: 1px solid var(--cor-texto);
-        padding: 5px;
-    }
+  th {
+    padding: 10px;
+    width: 9rem;
+    border-top: 2px solid var(--cor-texto);
+    border-bottom: 2px solid var(--cor-texto);
+    background-color: var(--cor-primaria);
+    color: var(--cor-destaque);
+    font-weight: 800;
+  }
 
-    tr {
-        transition: all 0.15  s ease;
-    }
+  td {
+    border-bottom: 1px solid var(--cor-texto);
+    padding: 6px;
+  }
 
-    tr:hover,
-    tr:active {
-      border-top: 1px solid var(--cor-destaque);
-      border-bottom: 1px solid var(--cor-destaque);
-      box-shadow: 0 0 6px inset rgb(from var(--cor-destaque) r g b / 0.6);
-      color: var(--cor-destaque);
-    }
+  tr {
+    transition: all 0.15s ease;
+  }
 
+  tr:nth-child(even) {
+    background-color: rgb(from var(--cor-secundaria) r g b / 0.1);
+  }
+
+  tr:hover,
+  tr:active {
+    box-shadow: 0 0 6px inset rgb(from var(--cor-destaque) r g b / 0.6);
+    color: var(--cor-destaque);
+  }
 </style>
