@@ -76,8 +76,6 @@ import InternoLayout from "@layouts/InternoLayout.astro";
   }
 
   function renderResultados(lista, query) {
-    if (!table || !tbody) return;
-
     if (!query.trim()) {
       table.style.visibility = "hidden";
       tbody.innerHTML = "";

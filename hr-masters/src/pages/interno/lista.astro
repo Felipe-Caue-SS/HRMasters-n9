@@ -1,15 +1,5 @@
 ---
 import InternoLayout from "@layouts/InternoLayout.astro";
-
-const funcionarios = [
-  {
-    nome: "Cleiton",
-    empresa: "Cleitinho Corp",
-    cargo: "CEO",
-    salario: 69000000,
-    status: "ativo",
-  },
-];
 ---
 
 <InternoLayout
@@ -18,7 +8,7 @@ const funcionarios = [
 >
   <h1>Lista</h1>
 
-  <table>
+  <table id="tabela">
     <tr>
       <th>Nome</th>
       <th>Empresa</th>
@@ -27,21 +17,49 @@ const funcionarios = [
       <th>Status</th>
     </tr>
 
-    <tbody>
-      {funcionarios.map((funcionario) => {
-        return (
-          <tr class={funcionario.status}>
-            <td>{funcionario.nome}</td>
-            <td>{funcionario.empresa}</td>
-            <td>{funcionario.cargo}</td>
-            <td>{funcionario.salario}</td>
-            <td>{funcionario.status}</td>
-          </tr>
-        );
-      })}
-    </tbody>
+    <tbody id="tabela-resultados"></tbody>
   </table>
 </InternoLayout>
+
+<script type="module">
+  import { dbSeedReady } from "@lib/seed";
+  import { listEmployees } from "@lib/dbFuncionarios";
+
+  const tabela = document.querySelector("#tabela");
+  const tbody = document.querySelector("#tabela-resultados");
+
+  dbSeedReady().catch((err) => {
+    console.error("Erro ao inicializar base:", err);
+  });
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#39;");
+  }
+
+  function renderResultados(lista) {
+    tbody.innerHTML = lista
+      .map((resultado) => {
+        const statusTexto = resultado.ativo ? "ativo" : "arquivado";
+        return `
+          <tr class="${statusTexto}">
+            <td>${escapeHtml(resultado.nome)}</td>
+            <td>${escapeHtml(resultado.cpf)}</td>
+            <td>${escapeHtml(resultado.empresa)}</td>
+            <td>${escapeHtml(resultado.cargo)}</td>
+            <td>${escapeHtml(statusTexto)}</td>
+          </tr>
+        `;
+      })
+      .join("");
+  }
+
+  renderResultados(await listEmployees())
+</script>
 
 <style>
   body {
