@@ -12,6 +12,7 @@ import InputSalario from "@components/InputSalario.astro";
   titulo="Cadastro"
   descricao="Cadastro de funcionarios no sistema hr masters"
 >
+  <h1>Cadastro</h1>
   <div class="form-wrapper">
     <form id="form-funcionario">
       <fieldset>
@@ -30,7 +31,7 @@ import InputSalario from "@components/InputSalario.astro";
       </fieldset>
 
       <fieldset>
-        <label for="cpf">cpf</label>
+        <label for="cpf">CPF</label>
         <InputCPF id="cpf" required={true} />
       </fieldset>
 
@@ -45,7 +46,7 @@ import InputSalario from "@components/InputSalario.astro";
       </fieldset>
 
       <fieldset>
-        <label for="email">email</label>
+        <label for="email">E-mail</label>
         <input
           id="email"
           type="email"
@@ -87,6 +88,14 @@ import InputSalario from "@components/InputSalario.astro";
 </InternoLayout>
 
 <style>
+  body {
+
+    h1 {
+      text-align: center;
+      margin-top: 20px;
+    }
+  }
+
   .form-wrapper {
     padding: 8px;
 
