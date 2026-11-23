@@ -22,3 +22,7 @@ export function formatSalario(valor: string | number): string {
     return `R$ ${reais}`;
   }
 }
+
+export function onlyDigits(value: string): string {
+  return value.replace(/\D/g, '');
+}

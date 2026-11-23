@@ -67,7 +67,8 @@ span,
 td,
 input,
 input::placeholder,
-button {
+button,
+select {
   font-family: "Source Sans 3", sans-serif;
   font-optical-sizing: auto;
   font-style: normal;
@@ -83,7 +84,8 @@ body {
 }
 
 input,
-button {
+button,
+select {
   padding: 4px 8px;
   border-radius: 8px;
   border: 2px solid var(--cor-primaria);
@@ -94,7 +96,9 @@ button {
 
 input:focus,
 button:focus,
-button:hover {
+button:hover,
+select:focus,
+select:hover {
   border: 2px solid var(--cor-secundaria);
   box-shadow: 0 0 8px inset rgb(from var(--cor-secundaria) r g b / 0.5);
 }

@@ -1,6 +1,6 @@
 import { seedData } from '@data/dadosIniciais.ts';
 import { createCompany, listCompanies } from './dbEmpresas';
-import { createEmployee, searchEmployees } from './dbFuncionarios';
+import { createEmployee, listEmployees } from './dbFuncionarios';
 
 let seedPromise: Promise<void> | null = null;
 
@@ -8,7 +8,7 @@ async function runSeed(): Promise<void> {
   if (typeof window === 'undefined') return;
 
   const existingCompanies = await listCompanies();
-  const existingEmployees = await searchEmployees({ status: 'todos' });
+  const existingEmployees = await listEmployees({ status: 'todos' });
 
   if (existingCompanies.length > 0 && existingEmployees.length > 0) {
     return;

@@ -7,31 +7,178 @@ import InternoLayout from "@layouts/InternoLayout.astro";
   descricao="Busca por funcionarios no sistema hr masters"
 >
   <h1>Busca</h1>
-  <fieldset>
-    <input id="query" type="search" />
-    <button id="buscar" type="submit">Buscar</button>
-  </fieldset>
+
+  <form id="form-busca" role="search">
+    <input
+      id="query"
+      name="query"
+      type="text"
+      placeholder="Nome ou CPF (ex.: Maria Silva ou 000.000.000-00)"
+      autocomplete="off"
+    />
+    <select id="tipo" name="tipo">
+      <option value="nome">Nome</option>
+      <option value="cpf">CPF</option>
+    </select>
+  </form>
+
+  <table id="tabela">
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>CPF</th>
+        <th>Empresa</th>
+        <th>Cargo</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="tabela-resultados"></tbody>
+  </table>
 </InternoLayout>
 
+<script type="module">
+  import { dbSeedReady } from "@lib/seed";
+  import { searchEmployees } from "@lib/dbFuncionarios";
+  import { formatCPF } from "@utils/cpfHandler";
+  import debounce from "@utils/debounce";
+
+  const form = document.querySelector("#form-busca");
+  const inputQuery = document.querySelector("#query");
+  const selectTipo = document.querySelector("#tipo");
+  const table = document.querySelector("#tabela");
+  const tbody = document.querySelector("#tabela-resultados");
+
+  dbSeedReady().catch((err) => {
+    console.error("Erro ao inicializar base:", err);
+  });
+
+  function detectarTipoAutomatico(valor) {
+    const primeiroChar = String(valor ?? "")
+      .trimStart()
+      .slice(0, 1);
+    switch (true) {
+      case /[0-9]/.test(primeiroChar):
+        return "cpf";
+      case /\p{L}/u.test(primeiroChar):
+        return "nome";
+      default:
+        return null;
+    }
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#39;");
+  }
+
+  function renderResultados(lista, query) {
+    if (!table || !tbody) return;
+
+    if (!query.trim()) {
+      table.style.visibility = "hidden";
+      tbody.innerHTML = "";
+      return;
+    }
+
+    table.style.visibility = "visible";
+
+    if (lista.length === 0) {
+      tbody.innerHTML = `
+        <tr class="aviso">
+          <td colspan="5">Nenhum resultado correspondente</td>
+        </tr>
+      `;
+      return;
+    }
+
+    tbody.innerHTML = lista
+      .map((resultado) => {
+        const statusTexto = resultado.ativo ? "ativo" : "arquivado";
+        return `
+          <tr class="${statusTexto}">
+            <td>${escapeHtml(resultado.nome)}</td>
+            <td>${escapeHtml(resultado.cpf)}</td>
+            <td>${escapeHtml(resultado.empresa)}</td>
+            <td>${escapeHtml(resultado.cargo)}</td>
+            <td>${escapeHtml(statusTexto)}</td>
+          </tr>
+        `;
+      })
+      .join("");
+  }
+
+  const buscarDebounced = debounce(async (query, tipo) => {
+    if (!query.trim()) {
+      renderResultados([], "");
+      return;
+    }
+
+    await dbSeedReady();
+    const resultados = await searchEmployees(query, tipo);
+    renderResultados(resultados, query);
+  }, 300);
+
+  inputQuery?.addEventListener("input", () => {
+    if (!inputQuery || !selectTipo) return;
+
+    const tipoDetectado = detectarTipoAutomatico(inputQuery.value);
+
+    switch (tipoDetectado) {
+      case "cpf":
+        selectTipo.value = "cpf";
+        try {
+          inputQuery.value = formatCPF(inputQuery.value);
+        } catch {}
+        break;
+      case "nome":
+        selectTipo.value = "nome";
+        break;
+    }
+
+    buscarDebounced(inputQuery.value, selectTipo.value);
+  });
+
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!inputQuery || !selectTipo) return;
+
+    const query = inputQuery.value;
+    const tipo = selectTipo.value;
+
+    if (!query.trim()) {
+      renderResultados([], "");
+      return;
+    }
+
+    await dbSeedReady();
+    const resultados = await searchEmployees(query, tipo);
+    renderResultados(resultados, query);
+  });
+</script>
+
 <style>
-    h1 {
-      margin-top: 20px;
-      text-align: center;
+  #form-busca {
+    display: flex;
+    justify-content: center;
+    #query {
+      width: 60vw;
+
+      border-radius: 8px 0 0 8px;
+      border-right: none;
     }
 
-    fieldset {
-        display: flex;
-        justify-content: center;
-        border: none;
-
-        #query {
-            width: 60vw;
-
-            border-radius: 8px 0 0 8px;
-        }
-
-        #buscar {
-            border-radius: 0 8px 8px 0;
-        }
+    #tipo {
+      border-radius: 0 8px 8px 0;
     }
+  }
+
+  #tabela {
+    visibility: hidden;
+    width: 100%;
+  }
 </style>
+

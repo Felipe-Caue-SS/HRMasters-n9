@@ -1,23 +1,24 @@
-import { EMPLOYEES_STORE, openDB } from './db.ts';
+import { EMPLOYEES_STORE, openDB } from "./db.ts";
 
-import { formatCPF, isValidCPF } from '@utils/cpfHandler';
-import { formatPisPasep, isValidPisPasep } from '@utils/pispasepHandler';
-import { formatTelefone, isValidTelefone } from '@utils/telefoneHandler';
-import { formatSalario, isValidSalario } from '@utils/salarioHandler';
+import { formatCPF, isValidCPF } from "@utils/cpfHandler";
+import { normalizeName } from "@utils/nameHandler.ts";
+import { formatPisPasep, isValidPisPasep } from "@utils/pispasepHandler";
+import { formatSalario, isValidSalario, onlyDigits } from "@utils/salarioHandler";
+import { formatTelefone, isValidTelefone } from "@utils/telefoneHandler";
 
 export interface Employee {
   id: string;
   nome: string;
   dataNascimento: string; // YYYY-MM-DD (input type="date")
-  cpf: string;            // nnn.nnn.nnn-nn
-  pisPasep: string;       // nnn.nnnnn.nn-n
-  telefone: string;       // +nn (nn) nnnnn - nnnn
+  cpf: string; // nnn.nnn.nnn-nn
+  pisPasep: string; // nnn.nnnnn.nn-n
+  telefone: string; // +nn (nn) nnnnn - nnnn
   email: string;
   empresaId: string;
   empresa: string;
-  dataAdmissao: string;   // YYYY-MM-DD (input type="date")
+  dataAdmissao: string; // YYYY-MM-DD (input type="date")
   cargo: string;
-  salario: string;        // R$ x,nn (ex.: "R$ 3.500,00" ou "R$ 1250,50")
+  salario: string; // R$ x,nn (ex.: "R$ 3.500,00" ou "R$ 1250,50")
   ativo: boolean;
   dataSaida: string | null;
   criadoEm: string;
@@ -26,63 +27,78 @@ export interface Employee {
 
 export type CreateEmployeeInput = Omit<
   Employee,
-  'id' | 'ativo' | 'dataSaida' | 'criadoEm' | 'atualizadoEm'
+  "id" | "ativo" | "dataSaida" | "criadoEm" | "atualizadoEm"
 >;
 
 export type UpdateEmployeeInput = Partial<
-  Omit<Employee, 'id' | 'criadoEm' | 'atualizadoEm'>
+  Omit<Employee, "id" | "criadoEm" | "atualizadoEm">
 >;
 
-export interface EmployeeFilters {
-  termo?: string;
-  empresaId?: string;
-  status?: 'ativos' | 'arquivados' | 'todos';
+export type EmployeeStatusFilter = 'ativos' | 'arquivados' | 'todos';
+export interface ListEmployeesFilters {
+  nome?: string;
+  empresa?: string;
+  cargo?: string;
+  salario?: string;
+  status?: EmployeeStatusFilter;
 }
 
+export type SearchQueryType = "nome" | "cpf";
 
-function normalizeEmployeeData(input: CreateEmployeeInput): CreateEmployeeInput {
+export interface EmployeeSearchFilters {
+  query?: string;
+  tipo?: SearchQueryType;
+  empresaId?: string;
+  status?: EmployeeStatusFilter;
+}
+
+function normalizeEmployeeData(
+  input: CreateEmployeeInput,
+): CreateEmployeeInput {
   const cpf = formatCPF(input.cpf);
   const pisPasep = formatPisPasep(input.pisPasep);
   const telefone = formatTelefone(input.telefone);
   const salario = formatSalario(input.salario);
 
-  if (!input.nome?.trim()) throw new Error('Nome é obrigatório.');
-  if (!input.dataNascimento) throw new Error('Data de nascimento é obrigatória.');
-  if (!isValidCPF(cpf)) throw new Error('CPF inválido. Use o formato nnn.nnn.nnn-nn.');
+  if (!input.nome?.trim()) throw new Error("Nome é obrigatório.");
+  if (!input.dataNascimento)
+    throw new Error("Data de nascimento é obrigatória.");
+  if (!isValidCPF(cpf))
+    throw new Error("CPF inválido. Use o formato nnn.nnn.nnn-nn.");
   if (!isValidPisPasep(pisPasep)) {
-    throw new Error('PIS/PASEP inválido. Use o formato nnn.nnnnn.nn-n.');
+    throw new Error("PIS/PASEP inválido. Use o formato nnn.nnnnn.nn-n.");
   }
   if (!isValidTelefone(telefone)) {
-    throw new Error('Telefone inválido. Use o formato +nn (nn) nnnnn - nnnn.');
+    throw new Error("Telefone inválido. Use o formato +nn (nn) nnnnn - nnnn.");
   }
-  if (!input.email?.trim()) throw new Error('E-mail é obrigatório.');
+  if (!input.email?.trim()) throw new Error("E-mail é obrigatório.");
   if (!input.empresaId?.trim() || !input.empresa?.trim()) {
-    throw new Error('Empresa é obrigatória.');
+    throw new Error("Empresa é obrigatória.");
   }
-  if (!input.dataAdmissao) throw new Error('Data de admissão é obrigatória.');
-  if (!input.cargo?.trim()) throw new Error('Cargo é obrigatório.');
+  if (!input.dataAdmissao) throw new Error("Data de admissão é obrigatória.");
+  if (!input.cargo?.trim()) throw new Error("Cargo é obrigatório.");
   if (!isValidSalario(salario)) {
-    throw new Error('Salário inválido. Use o formato R$ x,nn.');
+    throw new Error("Salário inválido. Use o formato R$ x,nn.");
   }
 
   return {
-    nome: input.nome.trim().replace(/\s+/g, ' '),
+    nome: input.nome.trim().replace(/\s+/g, " "),
     dataNascimento: input.dataNascimento,
     cpf,
     pisPasep,
     telefone,
     email: input.email.trim().toLowerCase(),
     empresaId: input.empresaId.trim(),
-    empresa: input.empresa.trim().replace(/\s+/g, ' '),
+    empresa: input.empresa.trim().replace(/\s+/g, " "),
     dataAdmissao: input.dataAdmissao,
-    cargo: input.cargo.trim().replace(/\s+/g, ' '),
+    cargo: input.cargo.trim().replace(/\s+/g, " "),
     salario,
   };
 }
 
 async function runTransactionHelper<Transaction>(
   mode: IDBTransactionMode,
-  executor: (store: IDBObjectStore) => IDBRequest<Transaction>
+  executor: (store: IDBObjectStore) => IDBRequest<Transaction>,
 ): Promise<Transaction> {
   const db = await openDB();
   return new Promise((resolve, reject) => {
@@ -97,7 +113,9 @@ async function runTransactionHelper<Transaction>(
 }
 
 // --- Operações CRUD ---
-export async function createEmployee(input: CreateEmployeeInput): Promise<Employee> {
+export async function createEmployee(
+  input: CreateEmployeeInput,
+): Promise<Employee> {
   const normalizado = normalizeEmployeeData(input);
   const agora = new Date().toISOString();
 
@@ -110,49 +128,95 @@ export async function createEmployee(input: CreateEmployeeInput): Promise<Employ
     atualizadoEm: agora,
   };
 
-  await runTransactionHelper('readwrite', (store) => store.add(employee));
+  await runTransactionHelper("readwrite", (store) => store.add(employee));
   return employee;
 }
 
 export async function getEmployeeById(id: string): Promise<Employee | null> {
-  const result = await runTransactionHelper('readonly', (store) => store.get(id));
+  const result = await runTransactionHelper("readonly", (store) =>
+    store.get(id),
+  );
   return (result as Employee) ?? null;
 }
 
-export async function searchEmployees(filters: EmployeeFilters = {}): Promise<Employee[]> {
-  const status = filters.status ?? 'ativos';
-  const empresaId = filters.empresaId ?? '';
-  const termo = (filters.termo ?? '').trim().toLowerCase();
+export async function listEmployees(
+  filters: ListEmployeesFilters = {}
+): Promise<Employee[]> {
+  const status: EmployeeStatusFilter = filters.status ?? 'todos';
+  const nomeFilter = normalizeName(filters.nome ?? '');
+  const empresaFilter = normalizeName(filters.empresa ?? '');
+  const cargoFilter = normalizeName(filters.cargo ?? '');
+  const salarioRaw = (filters.salario ?? '').trim().toLowerCase();
+  const salarioDigits = onlyDigits(salarioRaw);
 
-  const todos = await runTransactionHelper<Employee[]>('readonly', (store) => store.getAll());
+  const todos = await runTransactionHelper<Employee[]>('readonly', (store) =>
+    store.getAll()
+  );
 
   return (todos || []).filter((emp) => {
     if (status === 'ativos' && !emp.ativo) return false;
     if (status === 'arquivados' && emp.ativo) return false;
-    if (empresaId && emp.empresaId !== empresaId) return false;
 
-    if (termo) {
-      const corresponde =
-        emp.nome.toLowerCase().includes(termo) ||
-        emp.cpf.toLowerCase().includes(termo) ||
-        emp.pisPasep.toLowerCase().includes(termo) ||
-        emp.telefone.toLowerCase().includes(termo) ||
-        emp.email.toLowerCase().includes(termo) ||
-        emp.empresa.toLowerCase().includes(termo) ||
-        emp.cargo.toLowerCase().includes(termo) ||
-        emp.salario.toLowerCase().includes(termo);
+    if (nomeFilter && !normalizeName(emp.nome).includes(nomeFilter)) {
+      return false;
+    }
 
-      if (!corresponde) return false;
+    if (empresaFilter && !normalizeName(emp.empresa).includes(empresaFilter)) {
+      return false;
+    }
+
+    if (cargoFilter && !normalizeName(emp.cargo).includes(cargoFilter)) {
+      return false;
+    }
+
+    if (salarioRaw) {
+      const empSalarioLower = emp.salario.toLowerCase();
+      const empSalarioDigits = onlyDigits(emp.salario);
+
+      const matchesSalario =
+        empSalarioLower.includes(salarioRaw) ||
+        (salarioDigits.length > 0 && empSalarioDigits.includes(salarioDigits));
+
+      if (!matchesSalario) return false;
     }
 
     return true;
   });
 }
 
-export async function updateEmployee(id: string, updates: UpdateEmployeeInput): Promise<Employee> {
+export async function searchEmployees(
+  query: string,
+  tipo: SearchQueryType,
+): Promise<Employee[]> {
+  const trimmedQuery = query.trim();
+
+  const todos = await runTransactionHelper<Employee[]>("readonly", (store) =>
+    store.getAll(),
+  );
+
+  if (!trimmedQuery) {
+    return [];
+  } else {
+    switch (tipo) {
+      case "cpf":
+        return (todos || []).filter((emp) => emp.cpf.includes(trimmedQuery));
+
+      case "nome":
+        const normalizedQuery = normalizeName(trimmedQuery);
+        return (todos || []).filter((emp) =>
+          normalizeName(emp.nome).includes(normalizedQuery),
+        );
+    }
+  }
+}
+
+export async function updateEmployee(
+  id: string,
+  updates: UpdateEmployeeInput,
+): Promise<Employee> {
   const atual = await getEmployeeById(id);
   if (!atual) {
-    throw new Error('Funcionário não encontrado.');
+    throw new Error("Funcionário não encontrado.");
   }
 
   const mesclado: CreateEmployeeInput = {
@@ -175,19 +239,23 @@ export async function updateEmployee(id: string, updates: UpdateEmployeeInput): 
     ...atual,
     ...normalizado,
     ativo: updates.ativo ?? atual.ativo,
-    dataSaida: updates.dataSaida !== undefined ? updates.dataSaida : atual.dataSaida,
+    dataSaida:
+      updates.dataSaida !== undefined ? updates.dataSaida : atual.dataSaida,
     id: atual.id,
     criadoEm: atual.criadoEm,
     atualizadoEm: new Date().toISOString(),
   };
 
-  await runTransactionHelper('readwrite', (store) => store.put(atualizado));
+  await runTransactionHelper("readwrite", (store) => store.put(atualizado));
   return atualizado;
 }
 
-export async function archiveEmployee(id: string, dataSaida: string): Promise<Employee> {
+export async function archiveEmployee(
+  id: string,
+  dataSaida: string,
+): Promise<Employee> {
   if (!dataSaida) {
-    throw new Error('Informe a data de saída para arquivar o funcionário.');
+    throw new Error("Informe a data de saída para arquivar o funcionário.");
   }
 
   return updateEmployee(id, {
