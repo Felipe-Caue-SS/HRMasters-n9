@@ -1,5 +1,6 @@
 ---
 import BaseHead from "../components/BaseHead.astro";
+import { ClientRouter, fade } from "astro:transitions";
 
 interface Props {
   empresa: string;
@@ -13,25 +14,27 @@ const { titulo, descricao, empresa } = Astro.props;
 <!doctype html>
 <html lang="pt-br">
   <head>
-    <BaseHead titulo={titulo} descricao={descricao} />
+    <BaseHead titulo={titulo} descricao={descricao}>
+      <ClientRouter transition:animate={fade({ duration: '0.4s' })} />
+    </BaseHead>
   </head>
   <body id="app" data-empresa={empresa}>
     <header>
       <ul>
         <li>
           <h3>
-            <a href={`/${empresa}/`}>Home</a>
+            <a href="/">Home</a>
           </h3>
           
         </li>
         <li>
           <h3>
-            <a href={`/${empresa}/lista`}>Lista</a>
+            <a href="/clientes/">clientes</a>
           </h3>
         </li>
         <li>
           <h3>
-            <a href={`/${empresa}/busca`}>Busca</a>
+            <a href="/interno/">Interno</a>
           </h3>
         </li>
       </ul>

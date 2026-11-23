@@ -65,7 +65,7 @@ import ExternoLayout from "@layouts/ExternoLayout.astro";
   }
 
   async function init() {
-    if (!app) return;
+    if (!app || !tbody) return;
 
     if (!id) {
       app.innerHTML = "<h1>ID da empresa não informado na URL.</h1>";
@@ -99,7 +99,7 @@ import ExternoLayout from "@layouts/ExternoLayout.astro";
     }
   }
 
-  init();
+  document.addEventListener("astro:page-load", init());
 </script>
 
 <style>

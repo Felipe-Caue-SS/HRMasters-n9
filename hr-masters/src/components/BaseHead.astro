@@ -20,6 +20,8 @@ const { titulo = "HR Masters", descricao = "" } = Astro.props;
 <title>{titulo}</title>
 <meta name="descricao" content={descricao} />
 
+<slot/>
+
 <script>
   import { dbSeedReady } from '@lib/seed.ts';
 
